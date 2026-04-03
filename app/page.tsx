@@ -2,9 +2,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Overview } from "@/components/overview"
 import { RecentUpdates } from "@/components/recent-updates"
 import { Book, FileText, History, Users } from "lucide-react"
-import { acts, sections } from "@/lib/data"
+import prisma from "@/lib/prisma"
 
-export default function DashboardPage() {
+export default async function DashboardPage() {
+  const actsCount = await prisma.act.count();
+  const sectionsCount = await prisma.section.count();
+
   return (
     <div className="flex-1 space-y-4">
       <div className="flex items-center justify-between space-y-2">
@@ -19,7 +22,7 @@ export default function DashboardPage() {
             <Book className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{acts.length}</div>
+            <div className="text-2xl font-bold">{actsCount}</div>
             <p className="text-xs text-muted-foreground">
               Public domain acts available
             </p>
@@ -33,7 +36,7 @@ export default function DashboardPage() {
             <FileText className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{sections.length}</div>
+            <div className="text-2xl font-bold">{sectionsCount}</div>
             <p className="text-xs text-muted-foreground">
               Structured and explained
             </p>

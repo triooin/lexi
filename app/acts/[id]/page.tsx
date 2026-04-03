@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import { getActById, getSectionsByActId } from '@/lib/data';
+import prisma from '@/lib/prisma';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { buttonVariants } from '@/components/ui/button-variants';
@@ -10,24 +10,27 @@ import { cn } from '@/lib/utils';
 
 export default async function ActPage({ params }: { params: Promise<{ id: string }> }) {
   const id = (await params).id;
-  const act = getActById(id);
+  
+  const act = await prisma.act.findUnique({
+    where: { id },
+    include: {
+      sections: {
+        orderBy: {
+          number: 'asc',
+        }
+      }
+    }
+  });
   
   if (!act) {
     notFound();
   }
 
-  const sections = getSectionsByActId(id);
+  const sections = act.sections;
   
-  // Group sections by chapter
-  const chapters = sections.reduce((acc, section) => {
-    const chapterName = section.chapter || "General";
-    if (!acc[chapterName]) {
-      acc[chapterName] = [];
-    }
-    acc[chapterName].push(section);
-    return acc;
-  }, {} as Record<string, typeof sections>);
-
+  // Group sections by chapter (we don't have chapter in schema, so we'll just group them all under "Sections" for now, or we could add chapter to schema later)
+  // For now, let's just list them
+  
   return (
     <div className="max-w-4xl mx-auto space-y-8">
       <div>
@@ -40,7 +43,7 @@ export default async function ActPage({ params }: { params: Promise<{ id: string
           <div className="flex items-center gap-3">
             <Badge variant="outline" className="text-sm bg-muted">{act.type}</Badge>
             <Badge variant="outline" className="text-sm">Year {act.year}</Badge>
-            <span className="text-sm text-muted-foreground">Last updated: {act.lastUpdated}</span>
+            <span className="text-sm text-muted-foreground">Last updated: {new Date(act.updatedAt).toLocaleDateString()}</span>
           </div>
           <h1 className="text-3xl md:text-4xl font-bold text-foreground">{act.title}</h1>
           <p className="text-lg text-muted-foreground">{act.description}</p>
@@ -57,29 +60,27 @@ export default async function ActPage({ params }: { params: Promise<{ id: string
       </Alert>
 
       <div className="space-y-8">
-        {Object.entries(chapters).map(([chapterName, chapterSections]) => (
-          <div key={chapterName} className="space-y-4">
-            <h2 className="text-xl font-semibold text-foreground border-b pb-2">{chapterName}</h2>
-            <div className="grid gap-3">
-              {chapterSections.map((section) => (
-                <Link key={section.id} href={`/acts/${act.id}/sections/${section.id}`}>
-                  <Card className="hover:border-primary/50 hover:shadow-sm transition-all cursor-pointer">
-                    <CardHeader className="py-4">
-                      <div className="flex items-start gap-4">
-                        <div className="bg-muted text-foreground font-mono text-sm px-2 py-1 rounded shrink-0 mt-0.5">
-                          {section.nodeType} {section.sectionNumber ? section.sectionNumber : ''}
-                        </div>
-                        <CardTitle className="text-base font-medium leading-snug text-foreground">
-                          {section.title}
-                        </CardTitle>
+        <div className="space-y-4">
+          <h2 className="text-xl font-semibold text-foreground border-b pb-2">Sections</h2>
+          <div className="grid gap-3">
+            {sections.map((section) => (
+              <Link key={section.id} href={`/acts/${act.id}/sections/${section.id}`}>
+                <Card className="hover:border-primary/50 hover:shadow-sm transition-all cursor-pointer">
+                  <CardHeader className="py-4">
+                    <div className="flex items-start gap-4">
+                      <div className="bg-muted text-foreground font-mono text-sm px-2 py-1 rounded shrink-0 mt-0.5">
+                        {section.number}
                       </div>
-                    </CardHeader>
-                  </Card>
-                </Link>
-              ))}
-            </div>
+                      <CardTitle className="text-base font-medium leading-snug text-foreground">
+                        {section.title}
+                      </CardTitle>
+                    </div>
+                  </CardHeader>
+                </Card>
+              </Link>
+            ))}
           </div>
-        ))}
+        </div>
       </div>
     </div>
   );

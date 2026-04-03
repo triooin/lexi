@@ -1,11 +1,17 @@
 import Link from 'next/link';
-import { acts } from '@/lib/data';
+import prisma from '@/lib/prisma';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Book, Calendar, Clock, FileText } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 
-export default function ActsPage() {
+export default async function ActsPage() {
+  const acts = await prisma.act.findMany({
+    orderBy: {
+      title: 'asc',
+    },
+  });
+
   return (
     <div className="flex-1 space-y-4">
       <div className="flex items-center justify-between space-y-2">
@@ -43,7 +49,7 @@ export default function ActsPage() {
                   </div>
                   <div className="flex items-center gap-1">
                     <Clock className="h-3 w-3" />
-                    <span>Updated: {act.lastUpdated}</span>
+                    <span>Updated: {new Date(act.updatedAt).toLocaleDateString()}</span>
                   </div>
                 </div>
               </CardContent>

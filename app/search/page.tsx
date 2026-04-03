@@ -6,11 +6,13 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Search as SearchIcon, BookOpen, AlertCircle } from 'lucide-react';
-import { LegalSection } from '@/lib/data';
+import { Section, Act } from '@prisma/client';
+
+type SectionWithAct = Section & { act: Act };
 
 export default function SearchPage() {
   const [query, setQuery] = useState('');
-  const [results, setResults] = useState<LegalSection[]>([]);
+  const [results, setResults] = useState<SectionWithAct[]>([]);
   const [hasSearched, setHasSearched] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -82,14 +84,17 @@ export default function SearchPage() {
                     <CardHeader className="py-4">
                       <div className="flex items-start gap-4">
                         <div className="bg-muted text-foreground font-mono text-sm px-2 py-1 rounded shrink-0 mt-0.5">
-                          {section.nodeType} {section.sectionNumber ? section.sectionNumber : ''}
+                          Section {section.number}
                         </div>
                         <div className="space-y-1">
                           <CardTitle className="text-base font-medium leading-snug text-foreground">
                             {section.title}
                           </CardTitle>
                           <p className="text-sm text-muted-foreground line-clamp-2">
-                            {section.text}
+                            {section.content}
+                          </p>
+                          <p className="text-xs text-muted-foreground mt-2">
+                            From: {section.act.title}
                           </p>
                         </div>
                       </div>

@@ -1,0 +1,46 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Act {
+  id          String    @id @default(cuid())
+  title       String
+  year        Int
+  enactment   DateTime?
+  description String?
+  type        String    // e.g., "Civil", "Criminal", "Corporate"
+  status      String    @default("Active")
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  sections    Section[]
+  bookmarks   Bookmark[]
+}
+
+model Section {
+  id          String   @id @default(cuid())
+  actId       String
+  number      String   // e.g., "1", "2A", "10"
+  title       String
+  content     String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  act         Act      @relation(fields: [actId], references: [id], onDelete: Cascade)
+}
+
+model Bookmark {
+  id        String   @id @default(cuid())
+  userId    String   // For future auth integration
+  actId     String
+  createdAt DateTime @default(now())
+
+  act       Act      @relation(fields: [actId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, actId])
+}

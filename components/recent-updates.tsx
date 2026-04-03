@@ -1,9 +1,14 @@
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { acts } from "@/lib/data"
+import prisma from "@/lib/prisma"
 
-export function RecentUpdates() {
+export async function RecentUpdates() {
   // Get the 5 most recently updated acts
-  const recentActs = [...acts].sort((a, b) => new Date(b.lastUpdated).getTime() - new Date(a.lastUpdated).getTime()).slice(0, 5);
+  const recentActs = await prisma.act.findMany({
+    orderBy: {
+      updatedAt: 'desc',
+    },
+    take: 5,
+  });
 
   return (
     <div className="space-y-8">
@@ -15,7 +20,7 @@ export function RecentUpdates() {
           <div className="ml-4 space-y-1">
             <p className="text-sm font-medium leading-none">{act.title}</p>
             <p className="text-sm text-muted-foreground">
-              Updated {act.lastUpdated}
+              Updated {new Date(act.updatedAt).toLocaleDateString()}
             </p>
           </div>
           <div className="ml-auto font-medium text-sm text-muted-foreground">

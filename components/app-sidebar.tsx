@@ -58,11 +58,6 @@ const navItems = [
     icon: Search,
   },
   {
-    title: "Data Updates",
-    url: "/updates",
-    icon: Database,
-  },
-  {
     title: "Recent Updates",
     url: "/recent",
     icon: History,
