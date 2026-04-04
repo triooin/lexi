@@ -8,6 +8,8 @@ import { ChevronLeft, FileText, Info, AlertCircle } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { cn } from '@/lib/utils';
 
+export const dynamic = 'force-dynamic';
+
 export default async function ActPage({ params }: { params: Promise<{ id: string }> }) {
   const id = (await params).id;
   

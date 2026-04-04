@@ -5,6 +5,8 @@ import { Badge } from '@/components/ui/badge';
 import { Book, Calendar, Clock, FileText } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 
+export const dynamic = 'force-dynamic';
+
 export default async function ActsPage() {
   const acts = await prisma.act.findMany({
     orderBy: {

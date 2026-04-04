@@ -4,6 +4,8 @@ import { RecentUpdates } from "@/components/recent-updates"
 import { Book, FileText, History, Users } from "lucide-react"
 import prisma from "@/lib/prisma"
 
+export const dynamic = 'force-dynamic';
+
 export default async function DashboardPage() {
   const actsCount = await prisma.act.count();
   const sectionsCount = await prisma.section.count();

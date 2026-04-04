@@ -9,6 +9,8 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
 
+export const dynamic = 'force-dynamic';
+
 export default async function SectionPage({ params }: { params: Promise<{ id: string, sectionId: string }> }) {
   const { id, sectionId } = await params;
   
